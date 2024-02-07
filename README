@@ -1,0 +1,27 @@
+## XTRACT xtract_divergence
+# xtract-ing divergence metrics from blueprints
+
+# contains: 
+# xtract_divergence - the code for calculating divergence metrics
+# divergence_examples.sh - example calls of xtract_divergence
+# data, viewing_files and examples of divergence maps and divergence-based predictions
+
+
+########### Examples of divergence across species
+# includes whole-brain divergence, myelin map predictions and ROI translation
+# exampled with KLD, "shifted" KLD and JSD
+
+# Note: we focus on human-to-macaque translation
+
+# KLD = Kullback-Leibler divergence (with addition of small value to blueprint for better behaved divergence maps)
+# KLD_bias = old-style KLD, has issues with zeros in blueprints
+# JSD = Jenson Shannon divergence
+
+
+###### directory contains:
+# group-average blueprints for human (50 subjects) and macaque (6 subjects)
+# blueprint entropy maps (mapping vertex-wise fingerprint complexity)
+# whole-brain divergence maps
+# measured myelin maps and myelin map predictions
+# human example "seed" ROIs, divergence from ROI-averaged blueprint to whole-brain macaque (i.e. the prediction), and the target macaque ROI
+# examples for ROI prediction: MT, M1+S1, sub-thalamic nuclei
