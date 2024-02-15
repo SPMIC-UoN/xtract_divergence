@@ -258,33 +258,6 @@ parser.add_argument("-ncores", metavar='<int>', default=1, type=int, help="For J
 
 argsa = parser.parse_args()
 
-# test args
-# argsa = lambda:0
-# argsa.bpa_path = '/Users/shaunwarrington/Library/CloudStorage/OneDrive-TheUniversityofNottingham/Deliverables/Papers/subcortical_xtract/KLD_exmaples/data/hum_aveBP.LR.dscalar.nii'
-# argsa.bpb_path = '/Users/shaunwarrington/Library/CloudStorage/OneDrive-TheUniversityofNottingham/Deliverables/Papers/subcortical_xtract/KLD_exmaples/data/mac_aveBP.LR.dscalar.nii'
-# argsa.out = '/Users/shaunwarrington/Library/CloudStorage/OneDrive-TheUniversityofNottingham/Deliverables/Papers/subcortical_xtract'
-# argsa.maskaLR_path = ['/Users/shaunwarrington/Library/CloudStorage/OneDrive-TheUniversityofNottingham/Deliverables/Papers/subcortical_xtract/KLD_exmaples/data/hum_atlasroi.resampled.L.shape.gii', '/Users/shaunwarrington/Library/CloudStorage/OneDrive-TheUniversityofNottingham/Deliverables/Papers/subcortical_xtract/KLD_exmaples/data/hum_atlasroi.resampled.R.shape.gii']
-# argsa.maskbLR_path = ['/Users/shaunwarrington/Library/CloudStorage/OneDrive-TheUniversityofNottingham/Deliverables/Papers/subcortical_xtract/KLD_exmaples/data/mac_atlasroi.resampled.L.shape.gii', '/Users/shaunwarrington/Library/CloudStorage/OneDrive-TheUniversityofNottingham/Deliverables/Papers/subcortical_xtract/KLD_exmaples/data/mac_atlasroi.resampled.R.shape.gii']
-
-
-# argsa.tract_list = 'ac,af_l,af_r,amf_l,amf_r,ar_l,ar_r,atr_l,atr_r,cbd_l,cbd_r,cbp_l,cbp_r,cbt_l,cbt_r,cst_l,cst_r,emc_l,emc_r,fa_l,fa_r,fma,fmi,fx_l_new,fx_r_new,ifo_l,ifo_r,ilf_l,ilf_r,mdlf_l,mdlf_r,or_l,or_r,slf1_l,slf1_r,slf2_l,slf2_r,slf3_l,slf3_r,str_l,str_r,ufa_l,ufa_r,vof_l,vof_r'
-# argsa.metric = 'KLD'
-
-
-# # argsa.roi = None
-# argsa.roi = 'CIFTI_STRUCTURE_THALAMUS_LEFT'
-# # argsa.roi = 2429
-# # argsa.roi = 52,72,40
-# # argsa.roi = '/Users/shaunwarrington/Library/CloudStorage/OneDrive-TheUniversityofNottingham/Deliverables/Papers/subcortical_xtract/data/human/Target_rois/PreFront_Thal_L.nii.gz'
-
-# argsa.hemi = 'L'
-
-# argsa.ncores = 1
-
-# # argsa.source_map = None
-# argsa.source_maps = ['/Users/shaunwarrington/Library/CloudStorage/OneDrive-TheUniversityofNottingham/Deliverables/Papers/subcortical_xtract/data/human/hum_myelin.resample.L.func.gii', '/Users/shaunwarrington/Library/CloudStorage/OneDrive-TheUniversityofNottingham/Deliverables/Papers/subcortical_xtract/data/human/hum_myelin.resample.R.func.gii']
-# argsa.target_maps = ['/Users/shaunwarrington/Library/CloudStorage/OneDrive-TheUniversityofNottingham/Deliverables/Papers/subcortical_xtract/data/macaque/mac_myelin.resample.L.func.gii', '/Users/shaunwarrington/Library/CloudStorage/OneDrive-TheUniversityofNottingham/Deliverables/Papers/subcortical_xtract/data/macaque/mac_myelin.resample.R.func.gii']
-
 bpa_path = argsa.bpa_path
 bpb_path = argsa.bpb_path
 out = argsa.out
@@ -471,7 +444,7 @@ elif cmode == 'translate':
     print('Predicting left scalar...')
     temp_bpa_l = temp_bpa[:, :a_nvert_l]
     temp_bpb_l = temp_bpb[:, :b_nvert_l]
-    div = div_wholebrain(temp_bpb_l, temp_bpa_l, bpa, measure=metric, num_cores=argsa.ncores)
+    div = div_wholebrain(temp_bpb_l, temp_bpa_l, bpa, maskb, measure=metric, num_cores=argsa.ncores)
     map_pred_l = predict_map(div, source_map_img[:a_nvert_l])
 
     # null medial wall (required only for for SKLD)
@@ -487,7 +460,7 @@ elif cmode == 'translate':
     print('Predicting right scalar...')
     temp_bpa_r = temp_bpa[:, a_nvert_l:bpa_info.nvert]
     temp_bpb_r = temp_bpb[:, b_nvert_l:bpb_info.nvert]
-    div = div_wholebrain(temp_bpb_r, temp_bpa_r, bpa, measure=metric, num_cores=argsa.ncores)
+    div = div_wholebrain(temp_bpb_r, temp_bpa_r, bpa, maskb, measure=metric, num_cores=argsa.ncores)
     map_pred_r = predict_map(div, source_map_img[a_nvert_l:bpa_info.nvert])
     tempmask = maskb[b_nvert_l:bpb_info.nvert]
     map_pred_r[tempmask == 0] = 0
