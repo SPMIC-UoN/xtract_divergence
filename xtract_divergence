@@ -270,9 +270,11 @@ errflag = 0
 if not os.path.isfile(bpa_path):
     print(f"Blueprint file {bpa_path} not found")
     errflag = 1
+
 if not os.path.isfile(bpb_path):
     print(f"Blueprint file {bpb_path} not found")
     errflag = 1
+
 for mp in maskaLR_path + maskaLR_path:
     if not os.path.isfile(mp):
         print(f"Cortical mask file {mp} not found")
@@ -394,7 +396,7 @@ if cmode == 'roi_div':
         D = div_singleGO(temp_bpa_roi, temp_bpb, bpb, maskb, outname=foutname, measure=metric)
     elif roi_type == 'img':
         # add a check for whether the ROI is GIFTI (left or right) or NIFTI and then restrict the search accordingly
-        if '.nii.gz' in roi:
+        if roi.endswith('.nii.gz'):
             roi_img = nib.load(roi)
             roi_img = roi_img.get_fdata()
             if np.unique(roi_img).shape[0] > 2:
@@ -413,7 +415,7 @@ if cmode == 'roi_div':
                 warnings.simplefilter("ignore", category=RuntimeWarning)
                 temp_bpa_roi = np.mean(temp_bpa[:, roi_idx], axis=1)
         ###### for gii ROIs, need to sort indexing... ROI is not full surface structure
-        elif '.gii' in roi:
+        elif roi.endswith('.gii'):
             roi_img = nib.load(roi)
             roi_img = roi_img.darrays[0].data
             if np.unique(roi_img).shape[0] > 2:
@@ -421,13 +423,13 @@ if cmode == 'roi_div':
                 print('Binarising...')
                 roi_img = (roi_img > 0)*1
             roi_img = roi_img.astype(int)
-
+            
             # reduce the blueprint to the hemisphere vertices of interest
             if argsa.hemi == 'L':
                 temp_bpa_roi = temp_bpa[:, :bpa_info.nvert_l]
             else:
                 temp_bpa_roi = temp_bpa[:, bpa_info.nvert_l:bpa_info.nvert]
-            print(f'Avergaing blueprint across {len(roi_idx)} greyordinates')
+            print(f'Avergaing blueprint across {np.sum(roi_img)} greyordinates')
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore", category=RuntimeWarning)
                 temp_bpa_roi = np.mean(temp_bpa_roi[:, roi_img == 1], axis=1)
@@ -444,7 +446,7 @@ elif cmode == 'translate':
     print('Predicting left scalar...')
     temp_bpa_l = temp_bpa[:, :a_nvert_l]
     temp_bpb_l = temp_bpb[:, :b_nvert_l]
-    div = div_wholebrain(temp_bpb_l, temp_bpa_l, bpa, maskb, measure=metric, num_cores=argsa.ncores)
+    div = div_wholebrain(temp_bpb_l, temp_bpa_l, bpa, maskb[:b_nvert_l], measure=metric, num_cores=argsa.ncores)
     map_pred_l = predict_map(div, source_map_img[:a_nvert_l])
 
     # null medial wall (required only for for SKLD)
@@ -460,7 +462,7 @@ elif cmode == 'translate':
     print('Predicting right scalar...')
     temp_bpa_r = temp_bpa[:, a_nvert_l:bpa_info.nvert]
     temp_bpb_r = temp_bpb[:, b_nvert_l:bpb_info.nvert]
-    div = div_wholebrain(temp_bpb_r, temp_bpa_r, bpa, maskb, measure=metric, num_cores=argsa.ncores)
+    div = div_wholebrain(temp_bpb_r, temp_bpa_r, bpa, maskb[b_nvert_l:bpb_info.nvert], measure=metric, num_cores=argsa.ncores)
     map_pred_r = predict_map(div, source_map_img[a_nvert_l:bpa_info.nvert])
     tempmask = maskb[b_nvert_l:bpb_info.nvert]
     map_pred_r[tempmask == 0] = 0
