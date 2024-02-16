@@ -224,8 +224,8 @@ __  _______ ____      _    ____ _____   _ _
  """
 print(splash)
 
-parser = MyParser(prog='Xdiv',
-                  description='Xdiv: Cross-brain divergence for divergence maps and translations',
+parser = MyParser(prog='xtract_divergence',
+                  description='xtract_divergence: Cross-brain divergence for divergence maps and translations',
                   formatter_class=argparse.RawDescriptionHelpFormatter,
                   epilog=textwrap.dedent('''Example call for human-to-macaque prediction of cortical MT+ ROI in the left hemisphere:
                 xdiv -bpa human_BP.LR.dscalar.nii -bpb macaque_BP.LR.dscalar.nii 

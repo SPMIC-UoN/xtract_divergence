@@ -1,27 +1,56 @@
 ## XTRACT xtract_divergence
 # xtract-ing divergence metrics from blueprints
 
-# contains: 
-# xtract_divergence - the code for calculating divergence metrics
-# divergence_examples.sh - example calls of xtract_divergence
-# data, viewing_files and examples of divergence maps and divergence-based predictions
+
+__  _______ ____      _    ____ _____   _ _
+\ \/ /_   _|  _ \    / \  / ___|_   _|_| (_)_   __
+ \  /  | | | |_) |  / _ \| |     | |/ _` | \ \ / /
+ /  \  | | |  _ <  / ___ \ |___  | | (_| | |\ V /
+/_/\_\ |_| |_| \_\/_/   \_\____| |_|\__,_|_| \_/
+
+usage: xtract_divergence [-h] -bpa <CIFTI> -bpb <CIFTI> -out <folder> -masksa <GIFTI> <GIFTI> -masksb <GIFTI> <GIFTI> [-names <str> <str>] [-tract_list <list>] [-metric <str>]
+            [-roi <path,<int>,[<int>,<int>,<int>],<str>] [-base_scalars <GIFTI> <GIFTI>] [-target_scalars <GIFTI> <GIFTI>] [-hemi <str>] [-ncores <int>]
+
+xtract_divergence: Cross-brain divergence for divergence maps and translations
+
+options:
+  -h, --help            show this help message and exit
+  -bpa <CIFTI>          Path to CIFTI blueprint. This is the base blueprint
+  -bpb <CIFTI>          Path to CIFTI blueprint. This is the target blueprint: the space in which results will be saved
+  -out <folder>         Path to output folder (plus any filename prefixes)
+  -masksa <GIFTI> <GIFTI>
+                        Path to GIFTI cortical left/right ROIs (excluding medial wall) of the base blueprint
+  -masksb <GIFTI> <GIFTI>
+                        Path to GIFTI cortical left/right ROIs (excluding medial wall) of the target blueprint
+  -names <str> <str>    Names of base and target brains
+  -tract_list <list>    Comma separated tract list defining the set of tracts to include - these must present in each brain
+  -metric <str>         Kullback-Liebler (KLD, default), KLD without blueprint prep for backwards compatability (KLD_bias), or Jenson-Shannon (JSD) divergence
+  -roi <path,<int>,[<int>,<int>,<int>],<str>
+                        ROI or greyordinate coordinates (vertex index or voxel ijk indices) or CIFTI structure to calculate divergence wrt whole-brain. '-roi'
+                        requires '-hemi' to be defined.
+  -base_scalars <GIFTI> <GIFTI>
+                        The scalar maps (left/right GIFTIs) to translate between brains
+  -target_scalars <GIFTI> <GIFTI>
+                        Scalar maps (left/right GIFTIs) in the target space
+  -hemi <str>           If ROI prediction, the hemisphere of the ROI
+  -ncores <int>         For JSD, you may specify single-core (default) or multi-core processing
+
+Example call for human-to-macaque prediction of cortical MT+ ROI in the left hemisphere:
+                xdiv -bpa human_BP.LR.dscalar.nii -bpb macaque_BP.LR.dscalar.nii
+                    -masksa humam_atlasroi.L.shape.gii human_atlasroi.R.shape.gii
+                    -masksb macaque_atlasroi.L.shape.gii macaque_atlasroi.R.shape.gii
+                    -roi human_MTplus.L.shape.gii -hemi L
+
+                    "-roi" flag options:
+                            <path> to NIFTI/GIFTI binary mask. Mean blueprint in ROI used to calculate divergence to target whole-brain.
+                            <int> single greyordinare vertex index. i.e. divergence between cortical location and whole-brain.
+                            [<int>,<int>,<int>] ijk greyordinates. i.e. divergence between subcortical location and whole-brain.
+                            <str> CIFTI subcortical structure. Options are those available as subcortical structures in the CIFTI convention CIFTI_STRUCTURE_* e.g. "CIFTI_STRUCTURE_THALAMUS_LEFT".
+                            If no option supplied, will calculate dense (whole-brain to whole-brain) divergence.
+
+KLD = Kullback-Leibler divergence (with addition of small value to blueprint for better behaved divergence maps)
+KLD_bias = old-style KLD, has issues with zeros in blueprints
+JSD = Jenson Shannon divergence
 
 
-########### Examples of divergence across species
-# includes whole-brain divergence, myelin map predictions and ROI translation
-# exampled with KLD, "shifted" KLD and JSD
 
-# Note: we focus on human-to-macaque translation
-
-# KLD = Kullback-Leibler divergence (with addition of small value to blueprint for better behaved divergence maps)
-# KLD_bias = old-style KLD, has issues with zeros in blueprints
-# JSD = Jenson Shannon divergence
-
-
-###### directory contains:
-# group-average blueprints for human (50 subjects) and macaque (6 subjects)
-# blueprint entropy maps (mapping vertex-wise fingerprint complexity)
-# whole-brain divergence maps
-# measured myelin maps and myelin map predictions
-# human example "seed" ROIs, divergence from ROI-averaged blueprint to whole-brain macaque (i.e. the prediction), and the target macaque ROI
-# examples for ROI prediction: MT, M1+S1, sub-thalamic nuclei
